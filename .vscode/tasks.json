@@ -1,0 +1,64 @@
+{
+    "tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: Build on Windows",
+			"command": "cl.exe",
+			"args": [
+				"/Zi",
+				"/EHsc",
+				"/nologo",
+				"/std:c++latest",
+				"/ID:\\Windows Kits\\10\\Include\\10.0.19041.0\\ucrt\\.",
+				"/ID:\\Windows Kits\\10\\Include\\10.0.19041.0\\um\\.",
+				"/ID:\\Windows Kits\\10\\Include\\10.0.19041.0\\shared\\.",
+				"/Fe:",
+				"${workspaceFolder}\\bin\\wordle_solver.exe",
+				"${workspaceFolder}\\*.cpp",
+				"/await:strict",
+				// "/Bt", // Compile times
+				"-D_WIN32_WINDOWS=0x0A000008",
+				"-D_DEBUG"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"presentation": {
+				"focus": true
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: cl.exe"
+		},
+        {
+			"type": "cppbuild",
+			"label": "C/C++: Build on OSX",
+			"description": "g++ -std=c++2a -I/usr/local/include/asio/asio/include/ -I/usr/local/include/net/ -I/usr/local/include/fmt/include/  -obin/wordle_solver *.cpp -fcoroutines-ts",
+			"command": "g++",
+			"args": [
+				"-std=c++2a",
+				"-I.",
+				"-obin/wordle_solver",
+				"${workspaceFolder}/*.cpp",
+				"-D_DEBUG"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$msCompile"
+			],
+			// "group": {
+			// 	"kind": "build",
+			// 	"isDefault": true
+			// },
+			"detail": "compiler: clang++"
+		}
+    ],
+    "version": "2.0.0"
+}
