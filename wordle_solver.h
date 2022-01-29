@@ -2,29 +2,33 @@
 
 namespace wordle_solver_ns 
 {
-	template<typename T>
-	void print_list(const std::string& name, std::vector<T> collection)
+	namespace
 	{
-		std::cout << name << ": [";
-		auto it = collection.begin();
-		while(it != collection.end())
+		template<typename CollectionType>
+		void print_list(const std::string& list_name, CollectionType collection)
 		{
-			std::cout <<  *it;
-			if (it+1 != collection.end()) 
-				std::cout << ", ";
-			it++;
+			std::cout << list_name << ": [";
+			for (auto& item : collection)
+				std::cout << item << ((&item != &collection.back()) ? ", " : "");
+			std::cout << "]" << std::endl;
 		}
-		std::cout << "]" << std::endl;
+
+		template<typename CollectionType, typename Pred>
+		void copy_if(const CollectionType& source, CollectionType& target, Pred pred)
+		{
+			std::copy_if(source.begin(), source.end(), std::back_inserter(target), [&pred](auto& i) { return pred(i);});
+		}
 	}
 
-    std::vector<std::string> filter_by_pattern(std::vector<std::string>& words, const std::string& pattern)
+	template<typename CollectionType>
+    CollectionType filter_by_pattern(CollectionType& words, const std::string& pattern)
     {
-        std::vector<std::string> words_matching_pattern;
+        CollectionType words_matching_pattern;
 
-        for(auto& word : words)
-        {
-            bool is_valid = true;
-            for(int i = 0; i < 5; ++i)
+		copy_if(words, words_matching_pattern,
+		[&pattern](auto& word)
+		{
+			for(int i = 0; i < 5; ++i)
             {
                 char c = pattern.at(i);
 
@@ -32,78 +36,47 @@ namespace wordle_solver_ns
                     continue;
 
                 if (c != word.at(i))
-                {
-                    is_valid = false;
-                    break;
-                }
+					return false;
             }
-
-            if (is_valid)
-                words_matching_pattern.emplace_back(word);
-        }
+			return true;
+		});
 
         return words_matching_pattern;
     }
 
-    std::vector<std::string> filter_by_confirmed(std::vector<std::string>& words, const std::string& confirmed)
+	template<typename CollectionType>
+    CollectionType filter_by_confirmed(CollectionType& words, const std::string& confirmed)
     {
-        std::vector<std::string> words_containing_confirmed;
+        CollectionType words_containing_confirmed;
 
-        for (auto& word : words)
+		copy_if(words, words_containing_confirmed,
+		[&confirmed](auto& word)
         {
-            bool is_valid = true;
             for(char c : confirmed)
-            {
                 if (word.find(c) == std::string::npos)
-                {
-                    is_valid = false;
-                    break;
-                }
-            }
-            if (is_valid)
-                words_containing_confirmed.emplace_back(word);
-        }
+					return false;
+			return true;
+        });
         
         return words_containing_confirmed;
     }
 
-    std::vector<std::string> filter_by_rejected_letters(std::vector<std::string>& words, const std::string& pattern, const std::string& confirmed_letters, std::vector<std::string>& attempted)
+	template<typename CollectionType>
+    CollectionType filter_by_rejected_letters(CollectionType& words, const std::string& pattern, std::string confirmed_letters, CollectionType& attempted)
     {
-        std::vector<std::string> filtered;
+        CollectionType filtered;
 
-        std::string confirmed = confirmed_letters;
-        for (char c : pattern)
-        {
-            if (c != '#')
-                confirmed.push_back(c);
-        }
-        std::string rejected;
+		copy_if(pattern, confirmed_letters, [](const char c){ return c != '#'; });
+
+        std::string rejected_letters;
         for(auto& word : attempted)
-        {
-            for (char c : word)
-            {
-                if (confirmed.find(c) == std::string::npos)
-                {
-                    rejected.push_back(c);
-                }
-            }
-        }
+            copy_if(word, rejected_letters, [&confirmed_letters](const char c){ return confirmed_letters.find(c) == std::string::npos; });
 
-        for (auto& word : words)
-        {
-            bool is_valid = true;
-            for (char c : rejected)
-            {
-                if (word.find(c) != std::string::npos)
-                {
-                    is_valid = false;
-                    break;
-                }		
-            }
-
-            if (is_valid)
-                filtered.push_back(word);
-        }
+		copy_if(words, filtered, 
+		[&rejected_letters](auto& word)
+		{
+			return !std::any_of(rejected_letters.begin(), rejected_letters.end(), [&word](const char c){ return word.find(c) != std::string::npos; });
+		});
 
         return filtered;
     }
@@ -170,9 +143,7 @@ namespace wordle_solver_ns
 
 			std::map<char, float> letter_probability;
 			for (auto e : letter_occurences)
-			{
 				letter_probability[e.first] = ((float)e.second)/total_letters;
-			}
 
 			//Score
 			std::string best_word = words_[0];

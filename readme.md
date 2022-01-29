@@ -22,6 +22,7 @@
 * Write Solver
     1. ~~Write initial solver~~
     2. ~~Write tests for solver~~
-    3. Refactor with more 'functional' methods
+    3. ~~Refactor with more 'functional' methods~~
+    4. Enhance solver to store/track/use yellow letter position
 * Make it a bot
 
