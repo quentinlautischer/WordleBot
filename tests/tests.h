@@ -60,30 +60,29 @@ namespace tests
 
     void test_filterByConfirmed_emptyConfirms()
     {
-        auto filtered_values = wordle_solver_ns::filter_by_confirmed(sample_words, "");
+        auto filtered_values = wordle_solver_ns::filter_by_confirmed(sample_words, "#####");
 
         assertx::is_true(filtered_values.size() == 3, "test_filterByConfirmed_emptyConfirms is_true failed");
     }
 
     void test_filterByConfirmed_singleConfirms()
     {
-        auto filtered_values = wordle_solver_ns::filter_by_confirmed(sample_words, "k");
+        auto filtered_values = wordle_solver_ns::filter_by_confirmed(sample_words, "##k##");
 
         assertx::is_true(filtered_values.size() == 1, "test_filterByConfirmed_singleConfirms is_true failed");
         assertx::are_equal("knife", filtered_values.at(0), "test_filterByConfirmed_singleConfirms are_equal failed");
     }
 
-    void test_filterByConfirmed_joinedConfirms()
+    void test_filterByConfirmed_singleConfirms2()
     {
-        auto filtered_values = wordle_solver_ns::filter_by_confirmed(sample_words, "kn");
+        auto filtered_values = wordle_solver_ns::filter_by_confirmed(sample_words, "k####");
 
-        assertx::is_true(filtered_values.size() == 1, "test_filterByConfirmed_joinedConfirms is_true failed");
-        assertx::are_equal("knife", filtered_values.at(0), "test_filterByConfirmed_joinedConfirms are_equal failed");
+        assertx::is_true(filtered_values.size() == 0, "test_filterByConfirmed_singleConfirms is_true failed");
     }
 
     void test_filterByConfirmed_splitConfirms()
     {
-        auto filtered_values = wordle_solver_ns::filter_by_confirmed(sample_words, "ar");
+        auto filtered_values = wordle_solver_ns::filter_by_confirmed(sample_words, "##ar#");
 
         assertx::is_true(filtered_values.size() == 2, "test_filterByConfirmed_splitConfirms is_true failed");
         assertx::are_equal("later", filtered_values.at(0), "test_filterByConfirmed_splitConfirms are_equal failed");
@@ -92,7 +91,7 @@ namespace tests
 
     void test_filterByConfirmed_splitAndJoinedConfirms()
     {
-        auto filtered_values = wordle_solver_ns::filter_by_confirmed(sample_words, "are");
+        auto filtered_values = wordle_solver_ns::filter_by_confirmed(sample_words, "e#ar#");
 
         assertx::is_true(filtered_values.size() == 2, "test_filterByConfirmed_splitAndJoinedConfirms is_true failed");
         assertx::are_equal("later", filtered_values.at(0), "test_filterByConfirmed_splitAndJoinedConfirms are_equal failed");
@@ -129,7 +128,7 @@ namespace tests
     void test_filterByRejectedLetters_singlePatternSingleConfirmedSingleAttempted()
     {
         std::vector<std::string> attempted {"knife"};
-        auto filtered_values = wordle_solver_ns::filter_by_rejected_letters(sample_words, "###e#", "e", attempted);
+        auto filtered_values = wordle_solver_ns::filter_by_rejected_letters(sample_words, "###e#", "r####", attempted);
         assertx::is_true(filtered_values.size() == 2, "test_filterByRejectedLetters_singlePatternSingleConfirmedSingleAttempted is_true failed");
         assertx::are_equal("later", filtered_values.at(0), "test_filterByRejectedLetters_singlePatternSingleConfirmedSingleAttempted are_equal failed");
         assertx::are_equal("arose", filtered_values.at(1), "test_filterByRejectedLetters_singlePatternSingleConfirmedSingleAttempted are_equal failed");
@@ -143,7 +142,6 @@ namespace tests
 
         test_filterByConfirmed_emptyConfirms();
         test_filterByConfirmed_singleConfirms();
-        test_filterByConfirmed_joinedConfirms();
         test_filterByConfirmed_splitConfirms();
         test_filterByConfirmed_splitAndJoinedConfirms();
 

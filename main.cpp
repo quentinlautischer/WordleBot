@@ -64,13 +64,32 @@ int main()
 		{
 			size_t idx = input.find('|');
 			// Break apart and sanitize
-			std::string pattern = input.substr(0, idx);
-			std::string confirmed_letters = input.substr(idx+1, std::string::npos);
-			std::transform(pattern.begin(), pattern.end(), pattern.begin(), [](char c){ return std::tolower(c); });
-			std::transform(confirmed_letters.begin(), confirmed_letters.end(), confirmed_letters.begin(), [](char c){ return std::tolower(c); });
+			std::string green_pattern = input.substr(0, idx);
+			std::string yellow_pattern = input.substr(idx+1, std::string::npos);
+			std::transform(green_pattern.begin(), green_pattern.end(), green_pattern.begin(), [](char c){ return std::tolower(c); });
+			std::transform(yellow_pattern.begin(), yellow_pattern.end(), yellow_pattern.begin(), [](char c){ return std::tolower(c); });
+
+			if (green_pattern.size() == 0)
+				green_pattern = "#####";
+			else
+			if (green_pattern.size() != 5)
+			{
+				std::cout << "Invalid green pattern" << std::endl;
+				continue;
+			}
+
+			if (yellow_pattern.size() == 0)
+				yellow_pattern = "#####";
+			else
+			if (yellow_pattern.size() != 5)
+			{
+				std::cout << "Invalid yellow pattern" << std::endl;
+				continue;
+			}
+
 
 			// Crunch
-			solver.solve(pattern, confirmed_letters);
+			solver.solve(green_pattern, yellow_pattern);
 			auto best_word = solver.guess();
 			std::cout << "Best next guess: " << best_word << std::endl;
 			solver.add_attempt(best_word);

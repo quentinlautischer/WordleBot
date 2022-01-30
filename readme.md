@@ -1,4 +1,4 @@
-# Wordle Bot
+# Wordle Bot V2.0
 
 ## How to use Solver
 1. Ask for initial guess (ex: Query>guess)
@@ -23,6 +23,6 @@
     1. ~~Write initial solver~~
     2. ~~Write tests for solver~~
     3. ~~Refactor with more 'functional' methods~~
-    4. Enhance solver to store/track/use yellow letter position
+    4. ~~Enhance solver to store/track/use yellow letter position~~
 * Make it a bot
 

@@ -23,6 +23,9 @@ namespace wordle_solver_ns
     template<typename CollectionType>
     CollectionType filter_by_pattern(CollectionType& words, const std::string& pattern)
     {
+        if (pattern.size() != 5)
+            throw std::runtime_error("Invalid green pattern");
+
         CollectionType words_matching_pattern;
 
         copy_if(words, words_matching_pattern,
@@ -47,14 +50,27 @@ namespace wordle_solver_ns
     template<typename CollectionType>
     CollectionType filter_by_confirmed(CollectionType& words, const std::string& confirmed)
     {
+        if (confirmed.size() != 5)
+            throw std::runtime_error("Invalid yellow pattern");
+
         CollectionType words_containing_confirmed;
 
         copy_if(words, words_containing_confirmed,
         [&confirmed](auto& word)
         {
-            for(char c : confirmed)
-                if (word.find(c) == std::string::npos)
-                    return false;
+            for(size_t i = 0; i < 5; ++i)
+            {
+                char c = confirmed.at(i);
+
+                if (c == '#')
+                    continue;
+
+                auto idx = word.find(c);
+                // If yellow character is not in word thats a problem
+                // also if word has the yellow character at the same spot that's a problem.
+                if (idx == std::string::npos || idx == i)
+                    return false;   
+            }
             return true;
         });
         
@@ -62,11 +78,13 @@ namespace wordle_solver_ns
     }
 
     template<typename CollectionType>
-    CollectionType filter_by_rejected_letters(CollectionType& words, const std::string& pattern, std::string confirmed_letters, CollectionType& attempted)
+    CollectionType filter_by_rejected_letters(CollectionType& words, const std::string& pattern, const std::string& yellow_pattern, CollectionType& attempted)
     {
         CollectionType filtered;
 
+        std::string confirmed_letters;
         copy_if(pattern, confirmed_letters, [](const char c){ return c != '#'; });
+        copy_if(yellow_pattern, confirmed_letters, [](const char c){ return c != '#'; });
 
         std::string rejected_letters;
         for(auto& word : attempted)
@@ -174,11 +192,11 @@ namespace wordle_solver_ns
             return best_word;
         }
 
-        void solve(const std::string& pattern, const std::string& confirmed_letters)
+        void solve(const std::string& green_pattern, const std::string& yellow_pattern)
         {
-            auto a = filter_by_pattern(words_, pattern);
-            auto b = filter_by_confirmed(a, confirmed_letters);
-            words_ = filter_by_rejected_letters(b, pattern, confirmed_letters, attempts_);	
+            auto a = filter_by_pattern(words_, green_pattern);
+            auto b = filter_by_confirmed(a, yellow_pattern);
+            words_ = filter_by_rejected_letters(b, green_pattern, yellow_pattern, attempts_);	
         }
 
     private:
