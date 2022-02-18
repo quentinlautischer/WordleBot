@@ -95,7 +95,32 @@ int main()
 			solver.add_attempt(best_word);
 		}
 		else
-			std::cout << "Invalid query" << std::endl;
+		{
+			if (input.length() != 5)
+			{
+				std::cout << "Invalid query" << std::endl;
+				continue;
+			}
+
+			std::string green_pattern("#####");
+			std::string yellow_pattern("#####");
+
+			for (int i = 0; i < input.length(); ++i)
+			{
+				char c = input.at(i);
+				if (std::isupper(c))
+					green_pattern[i] = std::tolower(c);
+				if (std::islower(c))
+					yellow_pattern[i] = std::tolower(c);
+			}
+
+			// Crunch
+			solver.solve(green_pattern, yellow_pattern);
+			auto best_word = solver.guess();
+			std::cout << "Best next guess: " << best_word << std::endl;
+			solver.add_attempt(best_word);
+		}
+
 	}
 
 	return 0;
